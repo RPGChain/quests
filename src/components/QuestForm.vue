@@ -2,26 +2,89 @@
   <div class="space-y-4">
     
     <fwb-input v-model="quest.name" placeholder="Quest Name" label="Quest Name" />
-    <fwb-textarea v-model="quest.description" placeholder="Quest Description" label="Quest Description" />
-    <fwb-input v-model="quest.image" placeholder="Image URL" label="Image URL" />
-    <fwb-input v-model="quest.playable_starts_at" placeholder="Playable Starts At (YYYY-MM-DDTHH:mm:ss)" label="Playable Starts At" />
-    <fwb-input v-model="quest.playable_ends_at" placeholder="Playable Ends At (YYYY-MM-DDTHH:mm:ss)" label="Playable Ends At" />
-    <fwb-switch v-model="quest.private" label="Private" />
+    <fwb-textarea v-model="quest.description" placeholder="Quest Description" label="Quest Description">
+      <template #helper>
+        A short hook describing your quest.
+      </template>
+    </fwb-textarea>
+    <fwb-input v-model="quest.image" placeholder="Image URL" label="Image URL">
+      <template #helper>
+        An external url to an image to display as a teaser for this quest. 1280x720 is recommended.
+      </template>
+    </fwb-input>
 
-    <!-- Rolls -->
-    <div v-for="(roll, index) in quest.rolls" :key="index" class="border p-4">
-      <fwb-input v-model="roll.dc" label="Difficulty Class (DC)" placeholder="Enter DC" />
-      <fwb-input v-model="roll.key" label="Roll Key" placeholder="Enter Key" />
-      <fwb-input v-model="roll.label" label="Label" placeholder="Enter Label" />
-      <fwb-input v-model="roll.actionSuccess" label="Action on Success" placeholder="Enter Action Success" />
-      <fwb-input v-model="roll.actionFail" label="Action on Failure" placeholder="Enter Action Fail" />
-      <fwb-button @click="removeRoll(index)">Remove Roll</fwb-button>
-    </div>
-    <fwb-button @click="addRoll">Add Roll</fwb-button>
+    <fwb-accordion class="mb-4" :open-first-item="false">
+    <fwb-accordion-panel>
+      <fwb-accordion-header>Permissions</fwb-accordion-header>
+      <fwb-accordion-content>
+        <fwb-input v-model="quest.playable_starts_at" placeholder="Playable Starts At (YYYY-MM-DDTHH:mm:ss)" label="Playable Starts At">
+          <template #helper>
+            If the quest is only playable for a short amount of time, add the date it will become available
+          </template>
+        </fwb-input>
+        <fwb-input class="mt-4" v-model="quest.playable_ends_at" placeholder="Playable Ends At (YYYY-MM-DDTHH:mm:ss)" label="Playable Ends At">
+          <template #helper>
+            If the quest is only playable for a short amount of time, add the date it will no longer be available to play
+          </template>
+        </fwb-input>
+        <fwb-checkbox class="mt-4" v-model="quest.private" label="Private">
+          <template #helper>
+            Check this if the quest should not be available in public listings
+          </template>
+        </fwb-checkbox>
+        <label class="mt-4 block mb-2 text-sm font-medium text-gray-900 dark:text-white">Limit access by NFT</label>
+        <fwb-p class="opacity-75 text-xs">Be default, any user can play your quest. If you wish to only let your quest be playable by owners of a specific NFT. Enter the contract address to the NFT here.</fwb-p>
 
+        <fwb-table>
+    <fwb-table-head>
+      <fwb-table-head-cell>Contract</fwb-table-head-cell>
+      <fwb-table-head-cell>
+        <span class="sr-only">Edit</span>
+      </fwb-table-head-cell>
+    </fwb-table-head>
+    <fwb-table-body>
+      <fwb-table-row v-for="(address, index) in quest.token_contracts" :key="index">
+        <fwb-table-cell>
+          <fwb-input 
+            :value="address" 
+            @input="event => updateContractAddress(event, index)" 
+            label="NFT Contract Address" 
+            placeholder="Enter Address" 
+          />
+        </fwb-table-cell>
+        <fwb-table-cell>
+          <fwb-button @click="removeContractAddress(index)">Remove Address</fwb-button>
+        </fwb-table-cell>
+      </fwb-table-row>
+    </fwb-table-body>
+  </fwb-table>
+
+        <fwb-button @click="addContractAddress" class="mt-4">Add NFT Contract Address</fwb-button>
+      </fwb-accordion-content>
+    </fwb-accordion-panel>
+    </fwb-accordion>
+
+    <fwb-accordion :open-first-item="false">
+    <fwb-accordion-panel>
+      <fwb-accordion-header>Rolls</fwb-accordion-header>
+      <fwb-accordion-content>
+        <div v-for="(roll, index) in quest.rolls" :key="index" class="border p-4">
+          <fwb-input v-model="roll.dc" label="Difficulty Class (DC)" placeholder="Enter DC" />
+          <fwb-input v-model="roll.key" label="Roll Key" placeholder="Enter Key" />
+          <fwb-input v-model="roll.label" label="Label" placeholder="Enter Label" />
+          <fwb-input v-model="roll.actionSuccess" label="Action on Success" placeholder="Enter Action Success" />
+          <fwb-input v-model="roll.actionFail" label="Action on Failure" placeholder="Enter Action Fail" />
+          <fwb-button @click="removeRoll(index)">Remove Roll</fwb-button>
+        </div>
+        <fwb-button @click="addRoll">Add Roll</fwb-button>
+      </fwb-accordion-content>
+    </fwb-accordion-panel>
+    </fwb-accordion>
+
+    <fwb-heading tag="h2">Pages</fwb-heading>
     <!-- Pages -->
     <div v-for="(page, index) in quest.pages" :key="index" class="border p-4">
-      <fwb-input v-model="page.key" label="Page Key" placeholder="Enter Page Key" />
+      <fwb-input v-model="page.key" label="Page Name" placeholder="Enter Page Key" />
       <fwb-textarea v-model="page.markdown" label="Markdown Content" placeholder="Enter Markdown" />
       <fwb-input v-model="page.image" label="Image URL" placeholder="Enter Image URL" />
       <fwb-input v-model="page.xp" label="Experience Points (XP)" placeholder="Enter XP" type="number" />
@@ -30,24 +93,29 @@
     </div>
     <fwb-button @click="addPage">Add Page</fwb-button>
 
-    <!-- NFT Contract Addresses -->
-    <div v-for="(address, index) in quest.token_contracts" :key="index" class="border p-4">
-      <fwb-input 
-        :value="address" 
-        @input="event => updateContractAddress(event, index)" 
-        label="NFT Contract Address" 
-        placeholder="Enter Address" 
-      />
-      <fwb-button @click="removeContractAddress(index)">Remove Address</fwb-button>
-    </div>
-    <fwb-button @click="addContractAddress">Add NFT Contract Address</fwb-button>
-
   </div>
 </template>
 
 <script lang="ts" setup>
 import { defineProps, ref } from 'vue'
-import { FwbInput, FwbButton } from 'flowbite-vue'
+import { 
+  FwbInput, 
+  FwbTextarea, 
+  FwbButton, 
+  FwbHeading, 
+  FwbP,
+  FwbCheckbox,
+  FwbAccordion,
+  FwbAccordionContent,
+  FwbAccordionHeader,
+  FwbAccordionPanel, 
+  FwbTable,
+  FwbTableBody,
+  FwbTableCell,
+  FwbTableHead,
+  FwbTableHeadCell,
+  FwbTableRow,
+} from 'flowbite-vue'
 
 const props = defineProps({
   quest: Object

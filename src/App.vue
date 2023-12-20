@@ -45,7 +45,7 @@ const questJson = () => JSON.stringify(quest, null, 2);
     </template>
   </FwbNavbar>
 
-  <main class="container flex flex-wrap justify-between items-center mx-auto mb-8">
+  <main class="container flex flex-wrap justify-between items-center mx-auto mb-8 pb-8">
     <section>
 
       <div class="mt-4">
@@ -70,7 +70,7 @@ const questJson = () => JSON.stringify(quest, null, 2);
 
   </main>
 
-    <fwb-footer sticky>
+    <fwb-footer>
       <fwb-footer-copyright
         by="RPGChain"
         href="https://rpgchain.com"
