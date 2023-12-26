@@ -1,13 +1,15 @@
 <template>
-  <div class="space-y-4">
+  <div class="space-y-4 p-4 rounded bg-white shadow">
     
-    <fwb-input v-model="quest.name" placeholder="Quest Name" label="Quest Name" />
-    <fwb-textarea v-model="quest.description" placeholder="Quest Description" label="Quest Description">
+    <fwb-input class="mb-2" v-model="quest.name" placeholder="Quest Name" label="Quest Name" />
+
+    <fwb-textarea class="mb-0" v-model="quest.description" placeholder="Quest Description" label="Quest Description">
       <template #helper>
         A short hook describing your quest.
       </template>
     </fwb-textarea>
-    <fwb-input v-model="quest.image" placeholder="Image URL" label="Image URL">
+
+    <fwb-input class="mb-0" v-model="quest.image" placeholder="Image URL" label="Image URL">
       <template #helper>
         An external url to an image to display as a teaser for this quest. 1280x720 is recommended.
       </template>
@@ -35,47 +37,62 @@
         <label class="mt-4 block mb-2 text-sm font-medium text-gray-900 dark:text-white">Limit access by NFT</label>
         <fwb-p class="opacity-75 text-xs">Be default, any user can play your quest. If you wish to only let your quest be playable by owners of a specific NFT. Enter the contract address to the NFT here.</fwb-p>
 
-        <fwb-table>
-    <fwb-table-head>
-      <fwb-table-head-cell>Contract</fwb-table-head-cell>
-      <fwb-table-head-cell>
-        <span class="sr-only">Edit</span>
-      </fwb-table-head-cell>
-    </fwb-table-head>
-    <fwb-table-body>
-      <fwb-table-row v-for="(address, index) in quest.token_contracts" :key="index">
-        <fwb-table-cell>
-          <fwb-input 
-            :value="address" 
-            @input="event => updateContractAddress(event, index)" 
-            label="NFT Contract Address" 
-            placeholder="Enter Address" 
-          />
-        </fwb-table-cell>
-        <fwb-table-cell>
-          <fwb-button @click="removeContractAddress(index)">Remove Address</fwb-button>
-        </fwb-table-cell>
-      </fwb-table-row>
-    </fwb-table-body>
-  </fwb-table>
+        <fwb-table v-if="quest.token_contracts && quest.token_contracts.length > 0">
+          <fwb-table-head>
+            <fwb-table-head-cell>Contract Address</fwb-table-head-cell>
+            <fwb-table-head-cell>
+              <span class="sr-only">Edit</span>
+            </fwb-table-head-cell>
+          </fwb-table-head>
+          <fwb-table-body>
+            <fwb-table-row v-for="(address, index) in quest.token_contracts" :key="index">
+              <fwb-table-cell>
+                <fwb-input 
+                  :value="address" 
+                  @input="event => updateContractAddress(event, index)" 
+                  label="NFT Contract Address" 
+                  placeholder="Enter Address" 
+                />
+              </fwb-table-cell>
+              <fwb-table-cell>
+                <fwb-button @click="removeContractAddress(index)">Remove Address</fwb-button>
+              </fwb-table-cell>
+            </fwb-table-row>
+          </fwb-table-body>
+        </fwb-table>
 
         <fwb-button @click="addContractAddress" class="mt-4">Add NFT Contract Address</fwb-button>
+
       </fwb-accordion-content>
     </fwb-accordion-panel>
     </fwb-accordion>
 
-    <fwb-accordion :open-first-item="false">
+    <fwb-accordion :open-first-item="false" class="border border-gray-300 rounded-xl">
     <fwb-accordion-panel>
       <fwb-accordion-header>Rolls</fwb-accordion-header>
       <fwb-accordion-content>
-        <div v-for="(roll, index) in quest.rolls" :key="index" class="border p-4">
-          <fwb-input v-model="roll.dc" label="Difficulty Class (DC)" placeholder="Enter DC" />
-          <fwb-input v-model="roll.key" label="Roll Key" placeholder="Enter Key" />
-          <fwb-input v-model="roll.label" label="Label" placeholder="Enter Label" />
-          <fwb-input v-model="roll.actionSuccess" label="Action on Success" placeholder="Enter Action Success" />
-          <fwb-input v-model="roll.actionFail" label="Action on Failure" placeholder="Enter Action Fail" />
-          <fwb-button @click="removeRoll(index)">Remove Roll</fwb-button>
+
+        <div v-if="quest.rolls && quest.rolls.length > 0">
+            <div v-for="(roll, index) in quest.rolls" :key="index" class="flex border-l my-2 py-2">
+              <div>
+                <div class="flex">
+                  <fwb-input v-model="roll.key" label="Name" placeholder="Name" />
+                  <fwb-input v-model="roll.label" label="Label" placeholder="Enter Label" />
+                  <fwb-input v-model="roll.dc" label="Difficulty Class (DC)" placeholder="Enter DC" />
+                </div>
+                
+                <div class="flex">
+                  <fwb-input v-model="roll.actionSuccess" label="Action on Success" placeholder="Enter Action Success" />
+                  <fwb-input v-model="roll.actionFail" label="Action on Failure" placeholder="Enter Action Fail" />
+                </div>
+                
+              </div>
+              <div class="pl-4">
+                <fwb-button @click="removeRoll(index)">Remove Roll</fwb-button>
+              </div>
+            </div>
         </div>
+
         <fwb-button @click="addRoll">Add Roll</fwb-button>
       </fwb-accordion-content>
     </fwb-accordion-panel>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive } from 'vue';
 import { 
   FwbNavbar, 
   FwbNavbarLogo,
@@ -10,33 +10,35 @@ import {
   FwbFooterCopyright,
   FwbFooterLink,
   FwbFooterLinkGroup,
+  FwbModal
  } from 'flowbite-vue';
 import logoTextImage from './assets/img/logo-text.svg';
 import QuestForm from './components/QuestForm.vue';
+import QuestPlayer from '@written-rpg/quest-player';
 
-// Initial empty structure of the quest object
 const quest = reactive({
-  // Define the structure according to your quest schema
   name: '',
   description: '',
   image: '',
-  // ... other properties
 });
 
-// Watcher to monitor changes to the quest object
-watch(quest, (newQuest) => {
-  // Update logic (if any) when quest changes
-});
+const isShowingQuestPlayerModal = ref(false);
 
-// Method to convert the quest object to a JSON string for display
 const questJson = () => JSON.stringify(quest, null, 2);
+
+const closeQuestPlayerModal = () => {
+  isShowingQuestPlayerModal.value = false;
+};
+const showQuestPlayerModal = () => {
+  isShowingQuestPlayerModal.value = true;
+};
 </script>
 
 <template>
   <FwbNavbar class="border-gray-200 bg-white px-2 sm:px-4 py-2.5 dark:bg-gray-900 shadow">
     <FwbNavbarLogo alt="RPGChain Quest Creator" :image-url="logoTextImage" link="#" />
     <template #right-side>
-      <fwb-button gradient="green" class="mr-4">
+      <fwb-button gradient="green" class="mr-4" @click="showQuestPlayerModal">
         Play Quest
       </fwb-button>
       <fwb-button gradient="purple">
@@ -67,6 +69,24 @@ const questJson = () => JSON.stringify(quest, null, 2);
         <pre>{{ questJson() }}</pre>
       </section>
     </div>
+
+    <fwb-modal v-if="isShowingQuestPlayerModal" @close="closeQuestPlayerModal">
+      <template #header>
+        <h5 class="text-lg font-medium leading-normal text-gray-800">
+          Play Quest
+        </h5>
+      </template>
+
+      <template #body>
+        <QuestPlayer :quest="quest" />
+      </template>
+
+      <template #footer>
+        <fwb-button @click="closeQuestPlayerModal">
+          Close
+        </fwb-button>
+      </template>
+    </fwb-modal>
 
   </main>
 
